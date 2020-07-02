@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'coin_data.dart';
 import 'dart:io' show Platform;
+import 'package:http/http.dart' as http;
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -54,8 +57,22 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
+  var convertedPrice;
+  String url =
+      'https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=8C3EB7D6-49A8-4A6F-A664-11E3D631E369';
+
+  void getCurrentPrice() async {
+    http.Response response = await http.get(url);
+    print(response.statusCode);
+    var decodedData = jsonDecode(response.body);
+    print(decodedData);
+    var price = decodedData['rate'];
+    convertedPrice = price.toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
+    getCurrentPrice();
     return Scaffold(
       appBar: AppBar(
         title: Text('🤑 Coin Ticker'),
@@ -75,7 +92,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 BTC = $convertedPrice USD',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
